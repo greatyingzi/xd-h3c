@@ -1,5 +1,7 @@
 #include "authenticate.h"
 #include "md5/md5.h"
+#include "ifaddrs.h"
+#include "net/if_dl.h"
 
 const uint8_t BroadcastAddr[6] = {0xff,0xff,0xff,0xff,0xff,0xff}; // 广播MAC地址
 const uint8_t MulticastAddr[6] = {0x01,0x80,0xc2,0x00,0x00,0x03}; // 多播MAC地址
@@ -184,7 +186,9 @@ int Authentication(char *UserName, char *Password, char *DeviceName)
                         adhandle, ethhdr, captured);
                 break;
             case SUCCESS: /* 成功包 */
+            #if defined(HAVE_SIOCGIFHWADDR)
                 RunDHCP(DeviceName);
+            #endif
                 break;
             case FAILURE: /* 失败包 */
                 printf("[%d] Server: 认证失败。\n", (EAP_ID)captured[19]);
@@ -522,6 +526,7 @@ void GetIpFromDevice(uint8_t ip[4], const char* DeviceName)
     close(fd);
 }
 
+#if defined(HAVE_SIOCGIFHWADDR)
 /* 获取设备的MAC地址 */
 void GetDeviceMac(uint8_t mac[6], const char *devicename)
 {
@@ -545,6 +550,24 @@ void GetDeviceMac(uint8_t mac[6], const char *devicename)
     }
     close(sock);
 }
+#elif defined(HAVE_GETIFADDRS)
+void GetDeviceMac(uint8_t mac_addr[6], const char* if_name)
+{
+    struct ifaddrs* iflist;
+    if (getifaddrs(&iflist) == 0) {
+        for (struct ifaddrs* cur = iflist; cur; cur = cur->ifa_next) {
+            if ((cur->ifa_addr->sa_family == AF_LINK) &&
+                    (strcmp(cur->ifa_name, if_name) == 0) &&
+                    cur->ifa_addr) {
+                struct sockaddr_dl* sdl = (struct sockaddr_dl*)cur->ifa_addr;
+                memcpy(mac_addr, LLADDR(sdl), sdl->sdl_alen);
+                break;
+            }
+        }
+        freeifaddrs(iflist);
+    }
+}
+#endif
 
 /* 获取网络状态：网线是否插好 */
 int GetNetState(const char *nic_name)

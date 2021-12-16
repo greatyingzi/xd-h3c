@@ -2,6 +2,13 @@ CC=gcc
 BIN=xd-h3c
 LIBS= -lpcap -lm
 CFLAGS=-Wall
+
+###support linux
+#CFLAGS += -D HAVE_SIOCGIFHWADDR
+
+###support osx/macos
+CFLAGS += -D HAVE_GETIFADDRS
+
 INSTALL=install
 RM=rm
 

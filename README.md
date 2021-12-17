@@ -20,6 +20,16 @@ sudo apt-get install libpcap-dev
 编译
 
 ```
+Linux编译，修改Makefile
+###support linux
+CFLAGS += -D HAVE_SIOCGIFHWADDR
+#CFLAGS += -D HAVE_GETIFADDRS
+
+MacOS编译，修改Makefile
+###support osx/macos
+#CFLAGS += -D HAVE_SIOCGIFHWADDR
+CFLAGS += -D HAVE_GETIFADDRS
+
 make
 ```
 

@@ -13,6 +13,11 @@
 #include <net/if.h>
 #include <arpa/inet.h>
 
+#if defined(HAVE_GETIFADDRS)
+#include "ifaddrs.h"
+#include "net/if_dl.h"
+#endif
+
 /* 802.1X报文结构 */
 typedef enum {REQUEST=1, RESPONSE=2, SUCCESS=3, FAILURE=4, H3CDATA=10} EAP_Code;
 typedef enum {IDENTITY=1, NOTIFICATION=2, MD5=4, AVAILIABLE=20} EAP_Type;

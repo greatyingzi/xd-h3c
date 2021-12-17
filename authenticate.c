@@ -1,7 +1,5 @@
 #include "authenticate.h"
 #include "md5/md5.h"
-#include "ifaddrs.h"
-#include "net/if_dl.h"
 
 const uint8_t BroadcastAddr[6] = {0xff,0xff,0xff,0xff,0xff,0xff}; // 广播MAC地址
 const uint8_t MulticastAddr[6] = {0x01,0x80,0xc2,0x00,0x00,0x03}; // 多播MAC地址
